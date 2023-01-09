@@ -7,7 +7,7 @@ export const createAcc = async (accData) => {
     return data;
 }
 
-export const getPlans = async () => {
-    const { data }  = await axios.get(`${baseUrl}/quotes`);
+export const getQuotes = async () => {
+    const {data} = await axios.get(`${baseUrl}/quotes`);
     return data;
 }

@@ -2,8 +2,13 @@ import React, {useState} from 'react';
 import './AccountForm.scss';
 import {FormInput, FormSelect} from '../index';
 import {createAcc} from '../../utils/fetchApi';
+import {useGlobalContext} from '../../context/GlobalContext';
+import {useNavigate} from 'react-router';
 
 const AccountForm = () => {
+    const {setIsAccSuccess} = useGlobalContext();
+    const navigate = useNavigate();
+
     const initialAccState = {
         fields: {
             startDate: "",
@@ -59,8 +64,10 @@ const AccountForm = () => {
                     age: account.fields.age.length > 3 ? ageFromYear.toString() : account.fields.age,
                 });
                 if (res.success) {
+                    setIsAccSuccess(true);
                     setLoading(false);
                     resetForm(e);
+                    navigate(`/plans`);
                 } else {
                     setLoading(false);
                     setErrMessage("Some error occurred");
