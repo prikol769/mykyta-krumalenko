@@ -1,0 +1,54 @@
+@use '../../styles/variables.scss';
+
+.acc__form {
+  width: 700px;
+}
+
+.date__container {
+  display: flex;
+  justify-content: space-between;
+
+  @media screen and (max-width: variables.$screen-md-min) {
+    flex-direction: column;
+  }
+
+  div:first-child {
+    margin-right: 24px;
+  }
+}
+
+.btn__container {
+  margin-top: 24px;
+
+  @media screen and (max-width: variables.$screen-md-min) {
+    margin-top: 12px;
+  }
+
+  button {
+    cursor: pointer;
+    padding: 8px 16px;
+    text-transform: uppercase;
+    font-weight: 600;
+    border-radius: 8px;
+    color: #FFFFFF;
+    margin-right: 16px;
+
+    &:active {
+      transform: scale(0.98);
+    }
+  }
+
+  .btn__submit {
+    background-color: #00a206;
+    &:hover {
+      background-color: #006e04;
+    }
+  }
+
+  .btn__reset {
+    background-color: #D82121;
+    &:hover {
+      background-color: #9d0202;
+    }
+  }
+}
