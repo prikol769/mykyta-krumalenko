@@ -50,10 +50,13 @@ const AccountForm = () => {
         if(validation()){
             setLoading(true);
             try{
+                const ageFromYear = new Date().getFullYear() - account.fields.age;
+
                 const res = await createAcc({
                     ...account.fields,
                     startDate: new Date(account.fields.startDate),
                     endDate: new Date(account.fields.endDate),
+                    age: account.fields.age.length > 3 ? ageFromYear.toString() : account.fields.age,
                 });
                 if (res.success) {
                     setLoading(false);
