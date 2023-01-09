@@ -1,28 +1,32 @@
 import React, {useState} from 'react';
 import './AccountForm.scss';
 import {FormInput, FormSelect} from '../index';
+import {createAcc} from '../../utils/fetchApi';
 
 const AccountForm = () => {
     const initialAccState = {
         fields: {
             startDate: "",
             endDate: "",
-            citizenship: "",
-            ageOrYear: "",
+            citizenShip: "",
+            age: "",
             mailingState: "",
             policyMax: "",
         },
         errors: {
             startDate: "",
             endDate: "",
-            citizenship: "",
-            ageOrYear: "",
+            citizenShip: "",
+            age: "",
             mailingState: "",
             policyMax: "",
         }
     }
     const [account, setAccount] = useState(initialAccState);
+    const [errMessage, setErrMessage] = useState("");
+    const [loading, setLoading] = useState(false);
     console.log(account, 'account')
+    console.log(errMessage, 'errMessage')
 
     const handleChange = (e) => {
         const name = e.target.name;
@@ -41,14 +45,34 @@ const AccountForm = () => {
         });
     }
 
-    const submitAccForm = (e) => {
+    const submitAccForm = async (e) => {
         e.preventDefault();
-        validation();
+        if(validation()){
+            setLoading(true);
+            try{
+                const res = await createAcc({
+                    ...account.fields,
+                    startDate: new Date(account.fields.startDate),
+                    endDate: new Date(account.fields.endDate),
+                });
+                if (res.success) {
+                    setLoading(false);
+                    resetForm(e);
+                } else {
+                    setLoading(false);
+                    setErrMessage("Some error occurred");
+                }
+            }catch (err) {
+                setLoading(false);
+                console.log(err);
+            }
+        }
     }
 
     const resetForm = (e) => {
         e.preventDefault();
         setAccount(initialAccState);
+        setErrMessage("");
     }
 
     const validation = () => {
@@ -69,31 +93,37 @@ const AccountForm = () => {
             && fields.startDate
             && new Date(fields.endDate).toISOString() <= new Date(fields?.startDate).toISOString()
         ) {
+            formIsValid = false;
             errors["endDate"] = "The end date should be after the start date";
         }
 
-        //citizenship check
-        if (fields.citizenship && !fields.citizenship.match(/^[a-zA-Z]+$/)) {
-            errors["citizenship"] = "Should not allow numbers or special characters";
+        //citizenShip check
+        if (fields.citizenShip && !fields.citizenShip.match(/^[a-zA-Z]+$/)) {
+            formIsValid = false;
+            errors["citizenShip"] = "Should not allow numbers or special characters";
         }
 
         //mailingState check
         if (fields.mailingState && !fields.mailingState.match(/^[a-zA-Z]+$/)) {
+            formIsValid = false;
             errors["mailingState"] = "Should not allow numbers or special characters";
         }
 
         //ageOrYear check
-        const ageFromYear = new Date().getFullYear() - fields.ageOrYear
+        const ageFromYear = new Date().getFullYear() - fields.age
 
-        if ((fields.ageOrYear.length < 4 && fields.ageOrYear > 100) || (fields.ageOrYear.length >= 4 && ageFromYear > 100)) {
-            errors["ageOrYear"] = "You cannot be more than a 100 years old";
+        if ((fields.age.length < 4 && fields.age > 100) || (fields.age.length >= 4 && ageFromYear > 100)) {
+            formIsValid = false;
+            errors["age"] = "You cannot be more than a 100 years old";
         }
 
-        if ((!fields.ageOrYear.match(/^[0-9]*$/)) || (fields.ageOrYear.length >= 4 && ageFromYear < 0)) {
-            errors["ageOrYear"] = "Please enter only birth year or age";
+        if ((!fields.age.match(/^[0-9]*$/)) || (fields.age.length >= 4 && ageFromYear < 0)) {
+            formIsValid = false;
+            errors["age"] = "Please enter only birth year or age";
         }
 
         setAccount({...account, errors: {...account.errors, ...errors}});
+        return formIsValid;
     }
 
     return (
@@ -128,22 +158,22 @@ const AccountForm = () => {
                 errorMessage={account.errors.policyMax}
             />
             <FormInput
-                name="citizenship"
+                name="citizenShip"
                 placeholder="Citizenship"
                 type="text"
                 label="Citizenship"
-                value={account.fields.citizenship}
+                value={account.fields.citizenShip}
                 onChange={handleChange}
-                errorMessage={account.errors.citizenship}
+                errorMessage={account.errors.citizenShip}
             />
             <FormInput
-                name="ageOrYear"
+                name="age"
                 placeholder="Age/Year"
                 type="text"
                 label="Age/Year"
-                value={account.fields.ageOrYear}
+                value={account.fields.age}
                 onChange={handleChange}
-                errorMessage={account.errors.ageOrYear}
+                errorMessage={account.errors.age}
             />
             <FormInput
                 name="mailingState"
@@ -157,6 +187,8 @@ const AccountForm = () => {
             <div className="btn__container">
                 <button className="btn__submit" type="submit">submit</button>
                 <button className="btn__reset" onClick={resetForm}>reset</button>
+                {errMessage ? <p style={{color: 'red'}}>{errMessage}</p> : null}
+                {loading ? <p>...Loading</p> : null}
             </div>
         </form>
     );
