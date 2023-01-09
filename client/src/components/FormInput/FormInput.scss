@@ -1,0 +1,27 @@
+.input__wrapper {
+  min-height: 90px;
+  display: flex;
+  flex-direction: column;
+
+  &__label {
+    font-weight: 600;
+  }
+
+  input {
+    border: 1px solid #E0E1E7;
+    outline: none;
+    border-radius: 8px;
+    padding: 8px 12px;
+
+    &:hover {
+      border: 1px solid #C4C5D0;
+      transition: all 0.5s ease;
+    }
+  }
+
+  &__error {
+    margin-left: 8px;
+    color: #f60202;
+    font-size: 14px;
+  }
+}
