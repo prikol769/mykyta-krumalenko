@@ -1,4 +1,4 @@
-.input__wrapper {
+.select__wrapper {
   min-height: 90px;
   display: flex;
   flex-direction: column;
@@ -7,11 +7,11 @@
     font-weight: 600;
   }
 
-  input {
+  select {
     border: 1px solid #E0E1E7;
     outline: none;
     border-radius: 8px;
-    padding: 8px 12px;
+    padding: 8px 16px 8px 10px;
     min-height: 44px;
 
     &:hover {

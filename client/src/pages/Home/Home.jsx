@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import './Home.scss';
-import {FormInput} from '../../components';
+import {FormInput, FormSelect} from '../../components';
 
 const Home = () => {
     const initialAccState = {
@@ -10,6 +10,7 @@ const Home = () => {
             citizenship: "",
             ageOrYear: "",
             mailingState: "",
+            policyMax: "",
         },
         errors: {
             startDate: "",
@@ -17,6 +18,7 @@ const Home = () => {
             citizenship: "",
             ageOrYear: "",
             mailingState: "",
+            policyMax: "",
         }
     }
     const [account, setAccount] = useState(initialAccState);
@@ -116,6 +118,14 @@ const Home = () => {
                     errorMessage={account.errors.endDate}
                     // min={account.startDate ? new Date(account.startDate.value).toISOString().split("T")[0]: ""}
                 />
+                <FormSelect
+                    name="policyMax"
+                    label="Policy max"
+                    value={account.fields.policyMax}
+                    options={selectOptions}
+                    onChange={handleChange}
+                    errorMessage={account.errors.policyMax}
+                />
                 <FormInput
                     name="citizenship"
                     placeholder="Citizenship"
@@ -152,5 +162,12 @@ const Home = () => {
         </div>
     );
 };
+
+const selectOptions = [
+    {title: '50,000', value: 50},
+    {title: '100,000', value: 100},
+    {title: '250,000', value: 250},
+    {title: '500,000', value: 500},
+];
 
 export default Home;
