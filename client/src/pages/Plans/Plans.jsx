@@ -5,6 +5,7 @@ import {FormSelect, QuoteCard} from '../../components';
 
 const Plans = () => {
     const [quotesData, setQuotesData] = useState([]);
+    const [quotesDataFilter, setQuotesDataFilter] = useState([]);
     const [errMessage, setErrMessage] = useState("");
     const [loading, setLoading] = useState(false);
     // console.log(quotesData, 'quotesData');
@@ -13,17 +14,21 @@ const Plans = () => {
         view: 'List',
         sortByPrice: '',
         sortByName: '',
-        filter: '',
+        filterByBestSellers: '',
+        filterByType: '',
+        filterBySection: '',
     });
 
+
     const [selectedQuotes, setSelectedQuotes] = React.useState([]);
-    // console.log(setSelectedQuotes, 'setSelectedQuotes');
+    console.log(selectedQuotes, 'selectedQuotes');
 
 
     useEffect(() => {
         const fetchDataQuotes = async () => {
             const {quotes} = await getQuotes();
             setQuotesData(quotes);
+            setQuotesDataFilter(quotes);
             setErrMessage("");
             setLoading(false);
         }
@@ -51,35 +56,77 @@ const Plans = () => {
         }
     };
 
-    useEffect(() => {
-        console.log('optionsActions.sortByPrice')
+    const sortByPriceHandler = (result) => {
         if(optionsActions.sortByPrice === "HighPrice"){
-            const sortedByHigh = [...quotesData].sort((a, b) => b.price - a.price);
-            setQuotesData(sortedByHigh);
+            // console.log('sortByPriceHandler')
+            return [...result].sort((a, b) => b.price - a.price);
         }
         else if(optionsActions.sortByPrice === "LowPrice") {
-            const sortedByLow = [...quotesData].sort((a, b) => a.price - b.price);
-            setQuotesData(sortedByLow);
+            return [...result].sort((a, b) => a.price - b.price);
         } else {
-            const sortedById = [...quotesData].sort((a, b) => a.id - b.id);
-            setQuotesData(sortedById);
+            return [...result].sort((a, b) => a.id - b.id);
         }
-    }, [optionsActions.sortByPrice]);
+    };
+
+    const sortByNameHandler = (result) => {
+        if(optionsActions.sortByName === "AZ"){
+           return [...result].sort((a, b) => a.name.toUpperCase() > b.name.toUpperCase() ? 1 : -1);
+        }
+        else if(optionsActions.sortByName === "ZA") {
+            return [...result].sort((a, b) => a.name.toUpperCase() > b.name.toUpperCase() ? -1 : 1);
+        } else {
+            return [...result].sort((a, b) => a.id - b.id);
+        }
+    };
+
+    const filterByBestSellerHandle = (result) => {
+        if(optionsActions.filterByBestSellers === "BestSellers"){
+            return result.filter((item) => item.bestSellers);
+        }
+        else if(optionsActions.filterByBestSellers === "NoBestSellers"){
+            return result.filter((item) => !item.bestSellers);
+        }else {
+            return result;
+        }
+    }
+
+    const filterByTypeHandler = (result) => {
+        if(optionsActions.filterByType){
+            return result.filter((item) => item.type === optionsActions.filterByType);
+        } else {
+            return result;
+        }
+    }
+
+    const filterBySectionHandler = (result) => {
+        if(optionsActions.filterBySection){
+            return result.filter((item) => item.section === optionsActions.filterBySection);
+        } else {
+            return result;
+        }
+    }
 
     useEffect(() => {
-        if(optionsActions.sortByName === "AZ"){
-            const sortedByAZ = [...quotesData].sort((a, b) => a.name.toUpperCase() > b.name.toUpperCase() ? 1 : -1);
-            setQuotesData(sortedByAZ);
-        }
-        else if(optionsActions.sortByPrice === "ZA") {
-            const sortedByZA = [...quotesData].sort((a, b) => a.name.toUpperCase() > b.name.toUpperCase() ? -1 : 1);
-            setQuotesData(sortedByZA);
-        } else {
-            const sortedById = [...quotesData].sort((a, b) => a.id - b.id);
-            setQuotesData(sortedById);
-        }
-    }, [optionsActions.sortByName]);
-
+        let result = quotesData;
+        result = sortByNameHandler(result);
+        result = sortByPriceHandler(result);
+        result = filterByBestSellerHandle(result);
+        result = filterByTypeHandler(result);
+        result = filterBySectionHandler(result);
+        const myArrayFiltered = selectedQuotes.filter((selectedQuote) => {
+            return result.some((el) => {
+                return el.id === selectedQuote;
+            });
+        });
+        setSelectedQuotes([...myArrayFiltered]);
+        setQuotesDataFilter(result);
+    }, [
+        optionsActions.sortByPrice,
+        optionsActions.sortByName,
+        optionsActions.filterByBestSellers,
+        optionsActions.filterByType,
+        optionsActions.filterBySection
+    ]);
 
     return (
         <div className="plans__page">
@@ -110,11 +157,38 @@ const Plans = () => {
                     style={{maxWidth: 200}}
                     emptyOption
                 />
+                <FormSelect
+                    name="filterByBestSellers"
+                    label="Filter By Best Sellers"
+                    value={optionsActions.filterByBestSellers}
+                    options={filterByBestSellers}
+                    onChange={handleChange}
+                    style={{maxWidth: 200}}
+                    emptyOption
+                />
+                <FormSelect
+                    name="filterByType"
+                    label="Filter By Type"
+                    value={optionsActions.filterByType}
+                    options={filterByType}
+                    onChange={handleChange}
+                    style={{maxWidth: 200}}
+                    emptyOption
+                />
+                <FormSelect
+                    name="filterBySection"
+                    label="Filter By Section"
+                    value={optionsActions.filterBySection}
+                    options={filterBySection}
+                    onChange={handleChange}
+                    style={{maxWidth: 200}}
+                    emptyOption
+                />
 
             </div>
             <div
                 className={["quotes__container", optionsActions.view === "List" ? "view__list" : "view__grid"].join(' ')}>
-                {quotesData.map((quote) => {
+                {quotesDataFilter.map((quote) => {
                     return (
                         <QuoteCard
                             key={quote.id}
@@ -142,6 +216,23 @@ const sortByPrice = [
 const sortByName = [
     {title: 'A - Z', value: 'AZ'},
     {title: 'Z - A', value: 'ZA'},
+];
+
+const filterByBestSellers = [
+    {title: 'Best Sellers', value: 'BestSellers'},
+    {title: 'No Best Sellers', value: 'NoBestSellers'},
+];
+
+const filterByType = [
+    {title: 'Comprehensive', value: 'Comprehensive'},
+    {title: 'Fixed', value: 'Fixed'},
+];
+
+const filterBySection = [
+    {title: 'Travel Medical', value: 'Travel Medical'},
+    {title: 'International Travel Medical', value: 'International Travel Medical'},
+    {title: 'Student Medical', value: 'Student Medical'},
+    {title: 'J1 Medical', value: 'J1 Medical'},
 ];
 
 export default Plans;

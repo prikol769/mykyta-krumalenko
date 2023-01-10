@@ -6,9 +6,10 @@
 
 .action__container {
   display: flex;
+  flex-wrap: wrap;
 
-  div + div {
-    margin-left: 16px;
+  div {
+    margin-right: 16px;
   }
 }
 

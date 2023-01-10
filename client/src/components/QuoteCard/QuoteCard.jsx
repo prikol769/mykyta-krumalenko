@@ -5,7 +5,7 @@ const QuoteCard = ({quoteData, selected, onClickChecked}) => {
 
     return (
         <div className="quoteCard" onClick={() => onClickChecked(id)}>
-            <input className="quoteCard__checkbox" type="checkbox" checked={selected} />
+            <input className="quoteCard__checkbox" type="checkbox" checked={selected} onChange={() => onClickChecked(id)} />
             <p className="quoteCard__name">{name}</p>
             <p className="quoteCard__price">price: {price}$</p>
             <p className="quoteCard__description">{description}</p>
