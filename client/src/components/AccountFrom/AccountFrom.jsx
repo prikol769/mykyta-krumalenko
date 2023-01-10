@@ -166,6 +166,7 @@ const AccountForm = () => {
                 options={selectOptions}
                 onChange={handleChange}
                 errorMessage={account.errors.policyMax}
+                emptyOption
             />
             <FormInput
                 name="citizenShip"

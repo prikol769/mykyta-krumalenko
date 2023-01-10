@@ -1,6 +1,6 @@
 import React from 'react';
 import './FormSelect.scss';
-const FormSelect = ({value, onChange, label, errorMessage, name, options, ...rest}) => {
+const FormSelect = ({value, onChange, label, errorMessage, name, options, emptyOption, ...rest}) => {
     return (
         <div className="select__wrapper">
             <label className="select__wrapper__label">{label}</label>
@@ -10,7 +10,7 @@ const FormSelect = ({value, onChange, label, errorMessage, name, options, ...res
                 name={name}
                 {...rest}
             >
-                <option value={""}> -- select an option -- </option>
+                {emptyOption && <option value={""}> -- select an option -- </option>}
                 {options.map((option) => (
                 <option key={option.title} value={option.value}>{option.title}</option>
             ))}
