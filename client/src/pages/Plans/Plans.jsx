@@ -2,6 +2,13 @@ import React, {useEffect, useState, useCallback} from 'react';
 import './Plans.scss';
 import {getQuotes} from '../../utils/fetchApi';
 import {FormSelect, QuoteCard, ModalCompare} from '../../components';
+import {
+    selectViewConst,
+    sortByPriceConst,
+    sortByNameConst,
+    filterByBestSellersConst,
+    filterByTypeConst, filterBySectionConst
+} from '../../utils/constants';
 
 const Plans = () => {
     const [quotesData, setQuotesData] = useState([]);
@@ -11,7 +18,7 @@ const Plans = () => {
     const [modalCompareOpen, setModalCompareOpen] = useState(false);
 
     const [optionsActions, setOptionsActions] = useState({
-        view: 'List',
+        view: selectViewConst.LIST,
         sortByPrice: '',
         sortByName: '',
         filterByBestSellers: '',
@@ -63,10 +70,10 @@ const Plans = () => {
 
 
     const filterByBestSellerHandle = (result) => {
-        if(optionsActions.filterByBestSellers === "BestSellers"){
+        if(optionsActions.filterByBestSellers === filterByBestSellersConst.BEST_SELLERS){
             return result.filter((item) => item.bestSellers);
         }
-        else if(optionsActions.filterByBestSellers === "NoBestSellers"){
+        else if(optionsActions.filterByBestSellers === filterByBestSellersConst.NO_BEST_SELLERS){
             return result.filter((item) => !item.bestSellers);
         }else {
             return result;
@@ -90,10 +97,10 @@ const Plans = () => {
     }
 
     const sortByPriceHandler = (result) => {
-        if(optionsActions.sortByPrice === "HighPrice"){
+        if(optionsActions.sortByPrice === sortByPriceConst.HIGH_PRICE){
             return [...result].sort((a, b) => b.price - a.price);
         }
-        else if(optionsActions.sortByPrice === "LowPrice") {
+        else if(optionsActions.sortByPrice === sortByPriceConst.LOW_RICE) {
             return [...result].sort((a, b) => a.price - b.price);
         } else {
             return [...result].sort((a, b) => a.id - b.id);
@@ -101,10 +108,10 @@ const Plans = () => {
     };
 
     const sortByNameHandler = (result) => {
-        if(optionsActions.sortByName === "AZ"){
+        if(optionsActions.sortByName === sortByNameConst.AZ){
             return [...result].sort((a, b) => a.name.toUpperCase() > b.name.toUpperCase() ? 1 : -1);
         }
-        else if(optionsActions.sortByName === "ZA") {
+        else if(optionsActions.sortByName === sortByNameConst.ZA) {
             return [...result].sort((a, b) => a.name.toUpperCase() > b.name.toUpperCase() ? -1 : 1);
         } else {
             return [...result].sort((a, b) => a.id - b.id);
@@ -212,7 +219,7 @@ const Plans = () => {
             {loading ? <p>...Loading</p> : null}
             {!quotesDataFilter.length && !loading ? <p>No results</p> : null}
             <div
-                className={["quotes__container", optionsActions.view === "List" ? "view__list" : "view__grid"].join(' ')}>
+                className={["quotes__container", optionsActions.view === selectViewConst.LIST ? "view__list" : "view__grid"].join(' ')}>
                 {
                     quotesDataFilter.length && !loading
                         ? <>
@@ -242,35 +249,35 @@ const Plans = () => {
 };
 
 const selectView = [
-    {title: 'List', value: 'List'},
-    {title: 'Grid', value: 'Grid'},
+    {title: 'List', value: selectViewConst.LIST},
+    {title: 'Grid', value: selectViewConst.GRID},
 ];
 
 const sortByPrice = [
-    {title: 'High Price', value: 'HighPrice'},
-    {title: 'Low Price', value: 'LowPrice'},
+    {title: 'High Price', value: sortByPriceConst.HIGH_PRICE},
+    {title: 'Low Price', value: sortByPriceConst.LOW_RICE},
 ];
 
 const sortByName = [
-    {title: 'A - Z', value: 'AZ'},
-    {title: 'Z - A', value: 'ZA'},
+    {title: 'A - Z', value: sortByNameConst.AZ},
+    {title: 'Z - A', value: sortByNameConst.ZA},
 ];
 
 const filterByBestSellers = [
-    {title: 'Best Sellers', value: 'BestSellers'},
-    {title: 'No Best Sellers', value: 'NoBestSellers'},
+    {title: 'Best Sellers', value: filterByBestSellersConst.BEST_SELLERS},
+    {title: 'No Best Sellers', value: filterByBestSellersConst.NO_BEST_SELLERS},
 ];
 
 const filterByType = [
-    {title: 'Comprehensive', value: 'Comprehensive'},
-    {title: 'Fixed', value: 'Fixed'},
+    {title: 'Comprehensive', value: filterByTypeConst.COMPREHENSIVE},
+    {title: 'Fixed', value: filterByTypeConst.FIXED},
 ];
 
 const filterBySection = [
-    {title: 'Travel Medical', value: 'Travel Medical'},
-    {title: 'International Travel Medical', value: 'International Travel Medical'},
-    {title: 'Student Medical', value: 'Student Medical'},
-    {title: 'J1 Medical', value: 'J1 Medical'},
+    {title: 'Travel Medical', value: filterBySectionConst.TRAVEL_MEDICAL},
+    {title: 'International Travel Medical', value: filterBySectionConst.INTERNATIONAL_TRAVEL_MEDICAL},
+    {title: 'Student Medical', value: filterBySectionConst.STUDENT_MEDICAL},
+    {title: 'J1 Medical', value: filterBySectionConst.J1_MEDICAL},
 ];
 
 export default Plans;
