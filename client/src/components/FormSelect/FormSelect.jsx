@@ -10,7 +10,7 @@ const FormSelect = ({value, onChange, label, errorMessage, name, options, emptyO
                 name={name}
                 {...rest}
             >
-                {emptyOption && <option value={""}> -- select an option -- </option>}
+                {emptyOption && <option value={""}>Select an option</option>}
                 {options.map((option) => (
                 <option key={option.title} value={option.value}>{option.title}</option>
             ))}

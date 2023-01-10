@@ -4,6 +4,14 @@
   margin: 16px;
 }
 
+.action__container {
+  display: flex;
+
+  div + div {
+    margin-left: 16px;
+  }
+}
+
 .quotes__container {
   display: grid;
   row-gap: 16px;

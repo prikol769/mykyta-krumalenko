@@ -1,10 +1,10 @@
 import React from 'react';
 import './QuoteCard.scss';
-const QuoteCard = ({quoteData, selected, onChangeChecked}) => {
+const QuoteCard = ({quoteData, selected, onClickChecked}) => {
     const {bestSellers, description, name, price, section, type, id} = quoteData;
 
     return (
-        <div className="quoteCard" onClick={() => onChangeChecked(id)}>
+        <div className="quoteCard" onClick={() => onClickChecked(id)}>
             <input className="quoteCard__checkbox" type="checkbox" checked={selected} />
             <p className="quoteCard__name">{name}</p>
             <p className="quoteCard__price">price: {price}$</p>
