@@ -1,13 +1,14 @@
 import React, {useEffect, useState, useCallback} from 'react';
 import './Plans.scss';
 import {getQuotes} from '../../utils/fetchApi';
-import {FormSelect, QuoteCard} from '../../components';
+import {FormSelect, QuoteCard, ModalCompare} from '../../components';
 
 const Plans = () => {
     const [quotesData, setQuotesData] = useState([]);
     const [quotesDataFilter, setQuotesDataFilter] = useState([]);
     const [errMessage, setErrMessage] = useState("");
     const [loading, setLoading] = useState(false);
+    const [modalCompareOpen, setModalCompareOpen] = useState(false);
 
     const [optionsActions, setOptionsActions] = useState({
         view: 'List',
@@ -198,7 +199,14 @@ const Plans = () => {
                     style={{maxWidth: 200}}
                     emptyOption
                 />
-
+                <div className="compare__container">
+                    <button
+                        className="compare__container__btn"
+                        disabled={selectedQuotes.length > 4 || selectedQuotes.length < 2}
+                        onClick={() => setModalCompareOpen(true)}
+                    >Compare {selectedQuotes.length} plans
+                    </button>
+                </div>
             </div>
             {errMessage ? <p style={{color: 'red'}}>{errMessage}</p> : null}
             {loading ? <p>...Loading</p> : null}
@@ -222,6 +230,13 @@ const Plans = () => {
                         : null
                 }
             </div>
+            {modalCompareOpen
+                ? <ModalCompare
+                    setModalCompareOpen={setModalCompareOpen}
+                    quotesDataFilter={quotesDataFilter}
+                    selectedPlansId={selectedQuotes}/>
+                : null
+            }
         </div>
     );
 };
