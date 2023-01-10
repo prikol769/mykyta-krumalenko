@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, useCallback} from 'react';
 import './Plans.scss';
 import {getQuotes} from '../../utils/fetchApi';
 import {FormSelect, QuoteCard} from '../../components';
@@ -8,7 +8,6 @@ const Plans = () => {
     const [quotesDataFilter, setQuotesDataFilter] = useState([]);
     const [errMessage, setErrMessage] = useState("");
     const [loading, setLoading] = useState(false);
-    // console.log(quotesData, 'quotesData');
 
     const [optionsActions, setOptionsActions] = useState({
         view: 'List',
@@ -19,17 +18,15 @@ const Plans = () => {
         filterBySection: '',
     });
 
-
     const [selectedQuotes, setSelectedQuotes] = React.useState([]);
-    console.log(selectedQuotes, 'selectedQuotes');
 
 
     useEffect(() => {
         const fetchDataQuotes = async () => {
+            setLoading(true);
             const {quotes} = await getQuotes();
             setQuotesData(quotes);
             setQuotesDataFilter(quotes);
-            setErrMessage("");
             setLoading(false);
         }
 
@@ -45,39 +42,24 @@ const Plans = () => {
         const name = e.target.name;
         const value = e.target.value;
 
-        setOptionsActions({...optionsActions, [name]: value});
+        if(name === "sortByPrice"){
+            setOptionsActions({...optionsActions, [name]: value, sortByName: ''});
+        }else if(name === "sortByName"){
+            setOptionsActions({...optionsActions, [name]: value, sortByPrice: ''});
+        } else {
+            setOptionsActions({...optionsActions, [name]: value});
+        }
+
     }
 
-    const onClickChecked = (selectedId) => {
+    const onClickChecked = useCallback((selectedId) => {
         if(selectedQuotes.includes(selectedId)){
             setSelectedQuotes((current) => current.filter((id) => id !== selectedId));
         }else {
             setSelectedQuotes([...selectedQuotes, selectedId]);
         }
-    };
+    }, [selectedQuotes]);
 
-    const sortByPriceHandler = (result) => {
-        if(optionsActions.sortByPrice === "HighPrice"){
-            // console.log('sortByPriceHandler')
-            return [...result].sort((a, b) => b.price - a.price);
-        }
-        else if(optionsActions.sortByPrice === "LowPrice") {
-            return [...result].sort((a, b) => a.price - b.price);
-        } else {
-            return [...result].sort((a, b) => a.id - b.id);
-        }
-    };
-
-    const sortByNameHandler = (result) => {
-        if(optionsActions.sortByName === "AZ"){
-           return [...result].sort((a, b) => a.name.toUpperCase() > b.name.toUpperCase() ? 1 : -1);
-        }
-        else if(optionsActions.sortByName === "ZA") {
-            return [...result].sort((a, b) => a.name.toUpperCase() > b.name.toUpperCase() ? -1 : 1);
-        } else {
-            return [...result].sort((a, b) => a.id - b.id);
-        }
-    };
 
     const filterByBestSellerHandle = (result) => {
         if(optionsActions.filterByBestSellers === "BestSellers"){
@@ -106,19 +88,51 @@ const Plans = () => {
         }
     }
 
+    const sortByPriceHandler = (result) => {
+        if(optionsActions.sortByPrice === "HighPrice"){
+            return [...result].sort((a, b) => b.price - a.price);
+        }
+        else if(optionsActions.sortByPrice === "LowPrice") {
+            return [...result].sort((a, b) => a.price - b.price);
+        } else {
+            return [...result].sort((a, b) => a.id - b.id);
+        }
+    };
+
+    const sortByNameHandler = (result) => {
+        if(optionsActions.sortByName === "AZ"){
+            return [...result].sort((a, b) => a.name.toUpperCase() > b.name.toUpperCase() ? 1 : -1);
+        }
+        else if(optionsActions.sortByName === "ZA") {
+            return [...result].sort((a, b) => a.name.toUpperCase() > b.name.toUpperCase() ? -1 : 1);
+        } else {
+            return [...result].sort((a, b) => a.id - b.id);
+        }
+    };
+
+    const sortHandler = (result) => {
+        if(optionsActions.sortByPrice) {
+            return sortByPriceHandler(result);
+        } else if(optionsActions.sortByName){
+            return sortByNameHandler(result);
+        }else {
+            return result
+        }
+    }
+
     useEffect(() => {
         let result = quotesData;
-        result = sortByNameHandler(result);
-        result = sortByPriceHandler(result);
         result = filterByBestSellerHandle(result);
         result = filterByTypeHandler(result);
         result = filterBySectionHandler(result);
-        const myArrayFiltered = selectedQuotes.filter((selectedQuote) => {
+        result = sortHandler(result);
+
+        const filteredSelectedId = selectedQuotes.filter((selectedQuote) => {
             return result.some((el) => {
                 return el.id === selectedQuote;
             });
         });
-        setSelectedQuotes([...myArrayFiltered]);
+        setSelectedQuotes([...filteredSelectedId]);
         setQuotesDataFilter(result);
     }, [
         optionsActions.sortByPrice,
@@ -186,18 +200,27 @@ const Plans = () => {
                 />
 
             </div>
+            {errMessage ? <p style={{color: 'red'}}>{errMessage}</p> : null}
+            {loading ? <p>...Loading</p> : null}
+            {!quotesDataFilter.length && !loading ? <p>No results</p> : null}
             <div
                 className={["quotes__container", optionsActions.view === "List" ? "view__list" : "view__grid"].join(' ')}>
-                {quotesDataFilter.map((quote) => {
-                    return (
-                        <QuoteCard
-                            key={quote.id}
-                            quoteData={quote}
-                            selected={selectedQuotes.includes(quote.id)}
-                            onClickChecked={(id) => onClickChecked(id)}
-                        />
-                    )
-                })}
+                {
+                    quotesDataFilter.length && !loading
+                        ? <>
+                            {quotesDataFilter.map((quote) => {
+                                return (
+                                    <QuoteCard
+                                        key={quote.id}
+                                        quoteData={quote}
+                                        selected={selectedQuotes.includes(quote.id)}
+                                        onClickChecked={(id) => onClickChecked(id)}
+                                    />
+                                )
+                            })}
+                        </>
+                        : null
+                }
             </div>
         </div>
     );
